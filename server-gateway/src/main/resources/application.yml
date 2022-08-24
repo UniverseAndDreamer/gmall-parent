@@ -15,10 +15,10 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins: #允许所有地域来源跨域
-              - "*"
-            allowedMethods: #允许所有请求方式跨域
-              - "*"
+            allowedOrigins: "*"   #允许所有地域来源跨域
+            allowedMethods: "*"   #允许所有请求方式跨域
+            allowedHeaders: "*"
+            allowCredentials: true
       routes: #配置路由规则
         - id: product-route
           uri: lb://service-product

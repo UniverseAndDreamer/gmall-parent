@@ -8,7 +8,6 @@
         <module>model</module>
         <module>service</module>
         <module>server-gateway</module>
-        <module>service/service-product</module>
     </modules>
 
     <!--引入spring boot 父工程-->
