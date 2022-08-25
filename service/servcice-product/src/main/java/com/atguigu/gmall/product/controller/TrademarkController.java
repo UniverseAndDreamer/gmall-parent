@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin/product")
 public class TrademarkController {
@@ -14,6 +16,18 @@ public class TrademarkController {
 
     @Autowired
     private BaseTrademarkService baseTrademarkService;
+
+    //baseTrademark/getTrademarkList
+
+    /**
+     * 获取所有品牌
+     * @return
+     */
+    @GetMapping("baseTrademark/getTrademarkList")
+    public Result getTrademarkList() {
+        List<BaseTrademark> list = baseTrademarkService.list();
+        return Result.ok(list);
+    }
 
     /**
      * 分页查询
