@@ -27,4 +27,6 @@
         UPDATE sku_info SET is_sale = #{state}
         WHERE id = #{skuId}
     </update>
+
+
 </mapper>

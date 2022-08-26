@@ -1,9 +1,10 @@
 package com.atguigu.gmall.product.service.impl;
 
-import com.atguigu.gmall.model.product.SkuAttrValue;
-import com.atguigu.gmall.model.product.SkuImage;
-import com.atguigu.gmall.model.product.SkuInfo;
-import com.atguigu.gmall.model.product.SkuSaleAttrValue;
+import com.atguigu.gmall.model.product.*;
+import com.atguigu.gmall.model.to.CategoryViewTo;
+import com.atguigu.gmall.model.to.SkuDetailTo;
+import com.atguigu.gmall.product.mapper.BaseCategory2Mapper;
+import com.atguigu.gmall.product.mapper.BaseCategory3Mapper;
 import com.atguigu.gmall.product.service.SkuAttrValueService;
 import com.atguigu.gmall.product.service.SkuImageService;
 import com.atguigu.gmall.product.service.SkuSaleAttrValueService;
@@ -33,6 +34,8 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
     private SkuImageService skuImageService;
     @Resource
     private SkuInfoMapper skuInfoMapper;
+    @Resource
+    private BaseCategory3Mapper baseCategory3Mapper;
     @Override
     public void saveSkuInfo(SkuInfo skuInfo) {
         //1.存储sku基本信息
@@ -65,6 +68,22 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
     public void cancelSale(Long skuId) {
         skuInfoMapper.updateSaleState(skuId,0);
     }
+
+    @Override
+    public SkuDetailTo getSkuDetail(Long skuId) {
+        SkuDetailTo skuDetail = new SkuDetailTo();
+        //1.查询skuInfo
+        SkuInfo skuInfo = this.getById(skuId);
+        skuDetail.setSkuInfo(skuInfo);
+
+        //2.查询CategoryView
+        Long category3Id = skuInfo.getCategory3Id();
+        CategoryViewTo categoryView = baseCategory3Mapper.getCategoryView(category3Id);
+        skuDetail.setCategoryView(categoryView);
+        //TODO
+        return skuDetail;
+    }
+
 }
 
 

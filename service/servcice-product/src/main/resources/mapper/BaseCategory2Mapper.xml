@@ -13,4 +13,24 @@
     <sql id="Base_Column_List">
         id,name,category1_id
     </sql>
+    <resultMap id="CategoryTreeToList" type="com.atguigu.gmall.model.to.CategoryTreeTo">
+        <id property="categoryId" column="id"></id>
+        <result column="name" property="categoryName"/>
+        <collection property="categoryChild" ofType="com.atguigu.gmall.model.to.CategoryTreeTo">
+            <id property="categoryId" column="c2_id"></id>
+            <result column="c2_name" property="categoryName"/>
+            <collection property="categoryChild" ofType="com.atguigu.gmall.model.to.CategoryTreeTo">
+                <id property="categoryId" column="c3_id"></id>
+                <result column="c3_name" property="categoryName"/>
+            </collection>
+        </collection>
+    </resultMap>
+    <select id="getCategoryTreeToList" resultMap="CategoryTreeToList">
+        SELECT c1.*,c2.`id` c2_id,c2.`name` c2_name,c3.`id` c3_id, c3.`name` c3_name
+        FROM base_category1 c1
+                 LEFT JOIN base_category2 c2
+                           ON c1.`id` = c2.`category1_id`
+                 LEFT JOIN base_category3 c3
+                           ON c3.`category2_id`=c2.`id`
+    </select>
 </mapper>

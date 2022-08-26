@@ -1,6 +1,7 @@
 package com.atguigu.gmall.product.mapper;
 
 import com.atguigu.gmall.model.product.SkuInfo;
+import com.atguigu.gmall.model.to.SkuDetailTo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
@@ -14,6 +15,7 @@ import org.apache.ibatis.annotations.Param;
 public interface SkuInfoMapper extends BaseMapper<SkuInfo> {
 
     void updateSaleState(@Param("skuId") Long skuId, @Param("state") Integer state);
+
 }
 
 
