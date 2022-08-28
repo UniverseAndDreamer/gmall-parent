@@ -25,6 +25,9 @@ public class ItemController {
             //1.查询分类,条件
             model.addAttribute("categoryView", skuDetail.getCategoryView());
             model.addAttribute("skuInfo", skuDetail.getSkuInfo());
+            model.addAttribute("price", skuDetail.getPrice());
+            model.addAttribute("spuSaleAttrList", skuDetail.getSpuSaleAttrList());
+            model.addAttribute("valuesSkuJson", skuDetail.getValuesSkuJson());
         }
         return "item/index";
     }

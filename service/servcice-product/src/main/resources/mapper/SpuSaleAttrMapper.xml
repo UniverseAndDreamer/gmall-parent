@@ -28,4 +28,35 @@
                            ON ssa.`spu_id` = ssav.`spu_id` AND ssa.`base_sale_attr_id`=ssav.`base_sale_attr_id`
         WHERE ssa.`spu_id`=#{spuId}
     </select>
+
+    <resultMap id="spuSaleAttrListBySpuIdAndSkuId" autoMapping="true" type="com.atguigu.gmall.model.product.SpuSaleAttr">
+        <id property="id" column="id"></id>
+        <collection property="spuSaleAttrValueList" ofType="com.atguigu.gmall.model.product.SpuSaleAttrValue" autoMapping="true">
+            <id column="sid" property="id"/>
+        </collection>
+    </resultMap>
+    <select id="getSpuSaleAttrListBySpuIdAndSkuId" resultMap="spuSaleAttrListBySpuIdAndSkuId">
+        SELECT ssa.*,ssav.id sid,ssav.`sale_attr_value_name`,skav.`sale_attr_value_id`,
+               IF(skav.`sale_attr_value_id` IS NULL,0,1) AS is_checked
+        FROM spu_sale_attr ssa
+                 LEFT JOIN spu_sale_attr_value ssav
+                           ON ssa.`spu_id`=ssav.`spu_id` AND ssa.`base_sale_attr_id`=ssav.`base_sale_attr_id`
+                 LEFT JOIN sku_sale_attr_value skav
+                           ON  ssav.`id`=skav.`sale_attr_value_id` AND skav.`sku_id`=#{skuId}
+        WHERE ssa.`spu_id` = #{spuId} ORDER BY base_sale_attr_id,sid;
+    </select>
+    <select id="getSkuValueJsonList" resultType="com.atguigu.gmall.model.to.SkuValueJsonTo">
+        SELECT a.sku_id ,
+               GROUP_CONCAT(DISTINCT sale_attr_value_id ORDER BY sale_attr_value_id SEPARATOR '|') AS value_json
+        FROM (SELECT si.id sku_id,
+                     skav.id vid,
+                     skav.spu_id,
+                     skav.sale_attr_value_id,
+                     ssav.base_sale_attr_id
+              FROM sku_info si
+                       LEFT JOIN sku_sale_attr_value skav ON si.`id`=skav.`sku_id`
+                       LEFT JOIN spu_sale_attr_value ssav ON skav.`sale_attr_value_id`=ssav.`id`
+              WHERE si.`spu_id`=28 ORDER BY si.`id`,ssav.`base_sale_attr_id`,skav.`sale_attr_value_id`) a
+        GROUP BY a.sku_id
+    </select>
 </mapper>

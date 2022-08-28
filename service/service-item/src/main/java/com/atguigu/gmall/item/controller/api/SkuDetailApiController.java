@@ -17,6 +17,11 @@ public class SkuDetailApiController {
     @Autowired
     private SkuDetailService skuDetailService;
 
+    /**
+     * 获取商品详情
+     * @param skuId
+     * @return
+     */
     @GetMapping("/skuDetail/{skuId}")
     public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId) {
         SkuDetailTo skuDetailTo = skuDetailService.getSkuDetail(skuId);

@@ -1,4 +1,4 @@
-package com.atguigu.gmall.product.api;
+package com.atguigu.gmall.product.controller.api;
 
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.to.CategoryTreeTo;

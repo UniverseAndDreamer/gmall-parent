@@ -1,20 +1,23 @@
 package com.atguigu.gmall.product.service.impl;
 
+import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
+import com.atguigu.gmall.model.to.SkuValueJsonTo;
 import com.atguigu.gmall.product.mapper.BaseCategory2Mapper;
 import com.atguigu.gmall.product.mapper.BaseCategory3Mapper;
-import com.atguigu.gmall.product.service.SkuAttrValueService;
-import com.atguigu.gmall.product.service.SkuImageService;
-import com.atguigu.gmall.product.service.SkuSaleAttrValueService;
+import com.atguigu.gmall.product.service.*;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.atguigu.gmall.product.service.SkuInfoService;
 import com.atguigu.gmall.product.mapper.SkuInfoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -36,6 +39,8 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
     private SkuInfoMapper skuInfoMapper;
     @Resource
     private BaseCategory3Mapper baseCategory3Mapper;
+    @Autowired
+    private SpuSaleAttrService spuSaleAttrService;
     @Override
     public void saveSkuInfo(SkuInfo skuInfo) {
         //1.存储sku基本信息
@@ -80,9 +85,37 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         Long category3Id = skuInfo.getCategory3Id();
         CategoryViewTo categoryView = baseCategory3Mapper.getCategoryView(category3Id);
         skuDetail.setCategoryView(categoryView);
-        //TODO
+        //3、查询实时价格price
+        BigDecimal price = this.select1010Price(skuId);
+        skuDetail.setPrice(price);
+
+        //4、查询skuImageList放入skuInfo中
+        LambdaQueryWrapper<SkuImage> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SkuImage::getSkuId, skuId);
+        List<SkuImage> list = skuImageService.list(queryWrapper);
+        skuInfo.setSkuImageList(list);
+
+        //5、查询spuSaleAttrList:查询条件为skuId
+        Long spuId = skuInfo.getSpuId();
+        List<SpuSaleAttr> spuSaleAttrList = spuSaleAttrService.getSpuSaleAttrListBySpuIdAndSkuId(spuId, skuId);
+        skuDetail.setSpuSaleAttrList(spuSaleAttrList);
+        //6.查询valueJson
+        HashMap<String, Long> map = new HashMap<>();
+        List<SkuValueJsonTo> skuValueJsonToList = spuSaleAttrService.getSkuValueJsonList(spuId);
+        skuValueJsonToList.forEach(skuValueJsonTo -> {
+            map.put(skuValueJsonTo.getValueJson(), skuValueJsonTo.getSkuId());
+        });
+        skuDetail.setValuesSkuJson(Jsons.toStr(map));
+
         return skuDetail;
     }
+
+    @Override
+    public BigDecimal select1010Price(Long skuId) {
+
+        return skuInfoMapper.select1010Price(skuId);
+    }
+
 
 }
 
