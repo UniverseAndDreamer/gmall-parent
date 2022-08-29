@@ -11,7 +11,15 @@ public class Jsons {
             String s = objectMapper.writeValueAsString(obj);
             return s;
         } catch (JsonProcessingException e) {
-//            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static <T> T toObj(String json,Class<T> tClass) {
+        try {
+            T t = objectMapper.readValue(json, tClass);
+            return t;
+        } catch (JsonProcessingException e) {
             return null;
         }
     }

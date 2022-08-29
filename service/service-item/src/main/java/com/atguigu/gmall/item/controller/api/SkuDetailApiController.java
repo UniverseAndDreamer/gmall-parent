@@ -23,7 +23,7 @@ public class SkuDetailApiController {
      * @return
      */
     @GetMapping("/skuDetail/{skuId}")
-    public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId) {
+    public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId) throws Exception {
         SkuDetailTo skuDetailTo = skuDetailService.getSkuDetail(skuId);
         return Result.ok(skuDetailTo);
     }

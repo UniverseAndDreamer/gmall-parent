@@ -48,7 +48,6 @@ public class SpuInfoController {
      */
     @GetMapping("/baseSaleAttrList")
     public Result getBaseSaleAttrList() {
-        //todo
         List<BaseSaleAttr> list = baseSaleAttrService.list();
         return Result.ok(list);
     }
