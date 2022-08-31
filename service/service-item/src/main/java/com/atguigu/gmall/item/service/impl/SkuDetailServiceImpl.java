@@ -150,7 +150,9 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         }
         //4.bloom说有，可能有，加锁查询
         //试图抢锁
-        boolean b1 = lock.tryLock();
+//        boolean b1 = lock.tryLock();
+        boolean b1 = cacheService.tryLock(skuId);
+
         if (!b1) {
             //抢不到锁，睡眠1s后直接查询内存
             try {
@@ -168,7 +170,9 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         //bloom过滤器中添加此商品
         cacheService.addSkuIdForBloom(skuId);
         //解锁
-        lock.unlock();
+//        lock.unlock();
+        cacheService.unlock(skuId);
+
         return skuDetailRPC;
     }
 

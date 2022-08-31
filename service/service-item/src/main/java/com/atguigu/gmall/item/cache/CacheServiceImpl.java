@@ -4,6 +4,7 @@ import com.atguigu.gmall.common.constant.RedisConst;
 import com.atguigu.gmall.common.util.Jsons;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.redisson.api.RBloomFilter;
+import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -24,12 +25,12 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public <T> T getCacheData(String s, Class<T> tClass) {
         String json = redisTemplate.opsForValue().get(s);
-        if (json == null || json.equals(RedisConst.VALUE_NULL_TTL)) {
+        if (json == null || RedisConst.VALUE_NULL_TTL.equals(s)) {
             //说明缓存中无此数据
             return null;
         }
         //说明缓存中存在数据
-        T t = Jsons.toObj(s, tClass);
+        T t = Jsons.toObj(json, tClass);
         return t;
     }
 
@@ -64,4 +65,21 @@ public class CacheServiceImpl implements CacheService {
         RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(RedisConst.BLOOM_SKUID);
         bloomFilter.add(skuId);
     }
+
+    @Override
+    public boolean tryLock(Long skuId) {
+
+        RLock lock = redissonClient.getLock(RedisConst.LOCK_SKU_DETAIL + skuId);
+        boolean b = lock.tryLock();
+        return b;
+    }
+
+    @Override
+    public void unlock(Long skuId) {
+        RLock lock = redissonClient.getLock(RedisConst.LOCK_SKU_DETAIL + skuId);
+        lock.unlock();
+
+    }
+
+
 }

@@ -21,12 +21,12 @@ public class Jsons {
         if(StringUtils.isEmpty(json)){
             return null;
         }
+        T t = null;
         try {
-            T t = objectMapper.readValue(json, tClass);
+            t = objectMapper.readValue(json, tClass);
             return t;
         } catch (JsonProcessingException e) {
-
+            return null;
         }
-        return null;
     }
 }

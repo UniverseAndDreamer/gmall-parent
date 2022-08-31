@@ -11,4 +11,5 @@ public class RedisConst {
 
 
     public static final String BLOOM_SKUID = "bloom:skuid";
+    public static final String LOCK_SKU_DETAIL = "lock:sku:detail:";
 }
