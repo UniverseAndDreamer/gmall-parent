@@ -12,7 +12,7 @@
     <artifactId>service</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>servcice-product</module>
+        <module>service-product</module>
         <module>web-all</module>
         <module>service-item</module>
     </modules>

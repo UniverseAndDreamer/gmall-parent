@@ -116,6 +116,13 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         return skuInfoMapper.select1010Price(skuId);
     }
 
+    @Override
+    public List<Long> getAllSkuIds() {
+
+        return skuInfoMapper.getAllSkuIds();
+
+    }
+
 
 }
 

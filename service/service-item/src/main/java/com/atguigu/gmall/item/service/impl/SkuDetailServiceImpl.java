@@ -1,21 +1,26 @@
 package com.atguigu.gmall.item.service.impl;
-import com.atguigu.gmall.common.util.Jsons;
+
+import com.atguigu.gmall.common.constant.RedisConst;
 import com.atguigu.gmall.item.feign.SkuDetailFeignClient;
+import com.atguigu.gmall.item.cache.CacheService;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
 import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
+@Slf4j
 public class SkuDetailServiceImpl implements SkuDetailService {
 
     @Autowired
@@ -28,9 +33,15 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     @Autowired
     private ThreadPoolExecutor executor;
 
-//    HashMap<Long, SkuDetailTo> map = new HashMap<>();
+    Lock lock = new ReentrantLock();
+
+
+    //    HashMap<Long, SkuDetailTo> map = new HashMap<>();
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private CacheService cacheService;
 
 //    @Override
 //    public SkuDetailTo getSkuDetail(Long skuId) {
@@ -122,27 +133,70 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     }
 
     @Override
-    public SkuDetailTo getSkuDetail(Long skuId) throws  Exception {
-
-
-        String json = redisTemplate.opsForValue().get("skuDetail:info:" + skuId);
-        if ("x".equals(json)) {
+    public SkuDetailTo getSkuDetail(Long skuId) throws Exception {
+        String cacheKey = RedisConst.SKUDETAIL_KEY_PREFIX + skuId;
+        //1.从缓存中查询
+        SkuDetailTo skuDetail = cacheService.getCacheData(cacheKey, SkuDetailTo.class);
+        //2.判断缓存中是否查到了
+        if (skuDetail != null) {
+            //说明缓存中有，直接返回
+            return skuDetail;
+        }
+        //3.说明缓存未命中，询问bloom过滤器
+        Boolean b = cacheService.containsInBloom(skuId);
+        if (!b) {
+            //bloom说无，一定无
             return null;
         }
+        //4.bloom说有，可能有，加锁查询
+        //试图抢锁
+        boolean b1 = lock.tryLock();
+        if (!b1) {
+            //抢不到锁，睡眠1s后直接查询内存
+            try {
+                TimeUnit.SECONDS.sleep(1);
+                return cacheService.getCacheData(cacheKey, SkuDetailTo.class);
+            } catch (Exception e) {
 
-        if (StringUtils.isEmpty(json)) {
-            //说明为空，且是第一次查询
-            SkuDetailTo skuDetailRPC = getSkuDetailRPC(skuId);
-            if (skuDetailRPC==null) {
-                //如果数据库中没有此数据，则在redis中缓存一个值，表明此值最近被查询过，解决缓存穿透攻击问题
-                redisTemplate.opsForValue().set("skuDetail:info:" + skuId, "x", 30, TimeUnit.MINUTES);
             }
-            redisTemplate.opsForValue().set("skuDetail:info:" + skuId, Jsons.toStr(skuDetailRPC), 7, TimeUnit.DAYS);
-            return skuDetailRPC;
         }
-        //缓存中有，且数据不为"x",将json字符串转为对象返回
-        return Jsons.toObj(json, SkuDetailTo.class);
+        //抢到锁了,在数据库中进行查询
+        SkuDetailTo skuDetailRPC = getSkuDetailRPC(skuId);
+        log.info("{}商品缓存未命中，准备回源。。。。当前线程为：{}", skuId, Thread.currentThread().getName());
+        //放入缓存
+        cacheService.saveCacheData(cacheKey, skuDetailRPC);
+        //bloom过滤器中添加此商品
+        cacheService.addSkuIdForBloom(skuId);
+        //解锁
+        lock.unlock();
+        return skuDetailRPC;
     }
+
+
+    //使用分布式缓存
+//    @Override
+//    public SkuDetailTo getSkuDetail(Long skuId) throws  Exception {
+//
+//
+//        String json = redisTemplate.opsForValue().get("skuDetail:info:" + skuId);
+//        if ("x".equals(json)) {
+//            //查到值为"x",说明数据库中暂无此条数据，直接返回，避免缓存穿透攻击
+//            return null;
+//        }
+//
+//        if (StringUtils.isEmpty(json)) {
+//            //说明为空，且是第一次查询
+//            SkuDetailTo skuDetailRPC = getSkuDetailRPC(skuId);
+//            if (skuDetailRPC==null) {
+//                //如果数据库中没有此数据，则在redis中缓存一个值，表明此值最近被查询过，解决缓存穿透攻击问题
+//                redisTemplate.opsForValue().set("skuDetail:info:" + skuId, "x", 30, TimeUnit.MINUTES);
+//            }
+//            redisTemplate.opsForValue().set("skuDetail:info:" + skuId, Jsons.toStr(skuDetailRPC), 7, TimeUnit.DAYS);
+//            return skuDetailRPC;
+//        }
+//        //缓存中有，且数据不为"x",将json字符串转为对象返回
+//        return Jsons.toObj(json, SkuDetailTo.class);
+//    }
     //使用本地缓存
 //    @Override
 //    public SkuDetailTo getSkuDetail(Long skuId) throws Exception {
@@ -155,5 +209,26 @@ public class SkuDetailServiceImpl implements SkuDetailService {
 //        map.put(skuId, skuDetailRPC);
 //        return skuDetailRPC;
 //    }
-    //使用redis缓存
+    /**
+     * redis缓存存在的三个问题
+     *      1.缓存穿透：
+     *          理解：高并发查询redis、MySQL中都不存在的数据
+     *          影响：造成系统频繁的去回源：即高并发的去查询数据库的数据
+     *               缓存穿透是正常的，但是缓存穿透攻击不被允许
+     *          解决方案：加入空值缓存
+     *
+     *
+     *      2.缓存穿透：
+     *          理解：高并发查询大量的缓存不存在的数据，但数据库中有的数据
+     *          影响：造成系统频繁的去回源：即高并发的去查询数据库的数据
+     *          解决方案：加分布式锁（分布式项目） /单体项目（本地锁）
+     *
+     *
+     *      3.缓存雪崩：
+     *          理解：缓存中的大量数据在同一时间失效，同时，遭到用户的高并发访问，造成高并发的数据库IO
+     *          影响：高并发的去查询数据库的数据
+     *          解决方案：在对数据库中的数据进行缓存时，过期时间设置：业务时长*2+随机时长
+     *                  （在业务中此种情况较为极端）
+     *
+     */
 }

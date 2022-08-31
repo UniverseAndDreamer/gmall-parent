@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>servcice-product</artifactId>
+    <artifactId>service-product</artifactId>
     <dependencies>
         <dependency>
             <groupId>io.minio</groupId>

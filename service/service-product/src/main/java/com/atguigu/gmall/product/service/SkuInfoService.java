@@ -5,6 +5,7 @@ import com.atguigu.gmall.model.to.SkuDetailTo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
 * @author 美貌与智慧并存
@@ -23,4 +24,6 @@ public interface SkuInfoService extends IService<SkuInfo> {
 
 
     BigDecimal select1010Price(Long skuId);
+
+    List<Long> getAllSkuIds();
 }

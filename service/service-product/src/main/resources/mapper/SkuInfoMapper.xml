@@ -32,7 +32,9 @@
         FROM sku_info
         WHERE id = #{skuId}
     </select>
-
+    <select id="getAllSkuIds" resultType="java.lang.Long">
+        select id from sku_info
+    </select>
 
 
 </mapper>
