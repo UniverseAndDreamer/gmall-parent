@@ -1,6 +1,7 @@
 package com.atguigu.gmall.item.service.impl;
 
 import com.atguigu.gmall.common.constant.RedisConst;
+import com.atguigu.gmall.item.annotation.GmallCache;
 import com.atguigu.gmall.item.feign.SkuDetailFeignClient;
 import com.atguigu.gmall.item.cache.CacheService;
 import com.atguigu.gmall.item.service.SkuDetailService;
@@ -13,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.*;
@@ -132,12 +135,25 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         return skuDetailTo;
     }
 
+    //  √ 1.解决bloom过滤器只增不删的问题
+            /*
+                解决方案: 定期重建bloom过滤器
+             */
+    //TODO 2.使用AOP以及自定义注解，通用的解决从缓存中取数据的问题。实现用注解即可缓存数据
+            /*
+                自定义注解：GmallCache
+             */
+//    @Transactional
+//    @GmallCache(cacheKey = "")
+
+
+    @GmallCache(cacheKey = "")
     @Override
     public SkuDetailTo getSkuDetail(Long skuId) throws Exception {
         String cacheKey = RedisConst.SKUDETAIL_KEY_PREFIX + skuId;
         //1.从缓存中查询
         SkuDetailTo skuDetail = cacheService.getCacheData(cacheKey, SkuDetailTo.class);
-        //2.判断缓存中是否查到了
+        //2.判断缓存中是否查到
         if (skuDetail != null) {
             //说明缓存中有，直接返回
             return skuDetail;
