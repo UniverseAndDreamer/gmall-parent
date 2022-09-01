@@ -134,22 +134,9 @@ public class SkuDetailServiceImpl implements SkuDetailService {
 
         return skuDetailTo;
     }
-
-    //  √ 1.解决bloom过滤器只增不删的问题
-            /*
-                解决方案: 定期重建bloom过滤器
-             */
     //TODO 2.使用AOP以及自定义注解，通用的解决从缓存中取数据的问题。实现用注解即可缓存数据
-            /*
-                自定义注解：GmallCache
-             */
-//    @Transactional
-//    @GmallCache(cacheKey = "")
 
-
-    @GmallCache(cacheKey = "")
-    @Override
-    public SkuDetailTo getSkuDetail(Long skuId) throws Exception {
+    public SkuDetailTo getSkuDetailWithCache(Long skuId) throws Exception {
         String cacheKey = RedisConst.SKUDETAIL_KEY_PREFIX + skuId;
         //1.从缓存中查询
         SkuDetailTo skuDetail = cacheService.getCacheData(cacheKey, SkuDetailTo.class);
@@ -189,6 +176,16 @@ public class SkuDetailServiceImpl implements SkuDetailService {
 //        lock.unlock();
         cacheService.unlock(skuId);
 
+        return skuDetailRPC;
+    }
+
+    @Override
+    @GmallCache(cacheKey = RedisConst.SKUDETAIL_KEY_PREFIX + "#{#params[0]}",
+            bloomName = RedisConst.BLOOM_SKUID,
+            bloomValue = "#{#params[0]}",
+            lockName = RedisConst.LOCK_SKU_DETAIL + "#{#params[0]}")
+    public SkuDetailTo getSkuDetail(Long skuId) throws Exception {
+        SkuDetailTo skuDetailRPC = getSkuDetailRPC(skuId);
         return skuDetailRPC;
     }
 

@@ -9,5 +9,10 @@ public @interface GmallCache {
 
     String cacheKey() default "";
 
+    String bloomName() default "";
 
+    String bloomValue() default "";
+
+
+    String lockName() default "lock:global";
 }
