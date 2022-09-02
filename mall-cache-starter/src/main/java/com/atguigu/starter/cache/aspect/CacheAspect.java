@@ -1,20 +1,17 @@
-package com.atguigu.gmall.item.aspect;
+package com.atguigu.starter.cache.aspect;
 
-import com.atguigu.gmall.common.constant.RedisConst;
-import com.atguigu.gmall.item.annotation.GmallCache;
-import com.atguigu.gmall.item.cache.CacheService;
-import com.atguigu.gmall.model.to.SkuDetailTo;
+
+import com.atguigu.starter.cache.annotation.GmallCache;
+import com.atguigu.starter.cache.cache.CacheService;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.redisson.api.RBloomFilter;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -34,7 +31,7 @@ public class CacheAspect {
     private RedissonClient redissonClient;
 
     ExpressionParser parser = new SpelExpressionParser();
-
+    ParserContext parserContext = new TemplateParserContext();
 
 
     /**
@@ -42,7 +39,7 @@ public class CacheAspect {
      * @param joinPoint
      * @return
      */
-    @Around("@annotation(com.atguigu.gmall.item.annotation.GmallCache)")
+    @Around("@annotation(com.atguigu.starter.cache.annotation.GmallCache)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         //前置通知：
         System.out.println("前置通知。。。。");
@@ -92,7 +89,7 @@ public class CacheAspect {
             }else{
                 //加锁失败，当前线程睡眠1s后直接查询内存
                 TimeUnit.SECONDS.sleep(1);
-                return cacheService.getCacheData(cacheKey, SkuDetailTo.class);
+                return cacheService.getCacheData(cacheKey, type);
             }
         }finally {
             //7.解锁
@@ -146,7 +143,7 @@ public class CacheAspect {
 
     private <T> T evaluateExpression(String expression, ProceedingJoinPoint joinPoint, Class<T> clz) {
 
-        Expression parseExpression = parser.parseExpression(expression, new TemplateParserContext());
+        Expression parseExpression = parser.parseExpression(expression, parserContext);
         StandardEvaluationContext context = new StandardEvaluationContext();
         Object[] args = joinPoint.getArgs();
         context.setVariable("params", args);

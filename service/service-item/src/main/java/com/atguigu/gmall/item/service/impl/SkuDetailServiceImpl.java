@@ -1,15 +1,15 @@
 package com.atguigu.gmall.item.service.impl;
 
 import com.atguigu.gmall.common.constant.RedisConst;
-import com.atguigu.gmall.item.annotation.GmallCache;
 import com.atguigu.gmall.item.feign.SkuDetailFeignClient;
-import com.atguigu.gmall.item.cache.CacheService;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
 import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
+import com.atguigu.starter.cache.annotation.GmallCache;
+import com.atguigu.starter.cache.cache.CacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

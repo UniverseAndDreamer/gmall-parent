@@ -1,9 +1,8 @@
-package com.atguigu.gmall.item.cache;
+package com.atguigu.starter.cache.cache;
 
-import com.atguigu.gmall.common.constant.RedisConst;
-import com.atguigu.gmall.common.util.Jsons;
+import com.atguigu.starter.cache.constant.RedisConst;
+import com.atguigu.starter.cache.util.Jsons;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;

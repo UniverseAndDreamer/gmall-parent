@@ -1,4 +1,4 @@
-package com.atguigu.gmall.item.cache;
+package com.atguigu.starter.cache.cache;
 
 
 import java.lang.reflect.Type;
