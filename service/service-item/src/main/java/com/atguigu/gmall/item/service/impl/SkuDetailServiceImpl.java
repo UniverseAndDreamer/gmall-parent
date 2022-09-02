@@ -1,7 +1,7 @@
 package com.atguigu.gmall.item.service.impl;
 
 import com.atguigu.gmall.common.constant.RedisConst;
-import com.atguigu.gmall.item.feign.SkuDetailFeignClient;
+import com.atguigu.gmall.feign.product.SkuInfoFeignClient;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
 import com.atguigu.gmall.model.product.SkuInfo;
@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SkuDetailServiceImpl implements SkuDetailService {
 
     @Autowired
-    private SkuDetailFeignClient skuDetailFeignClient;
+    private SkuInfoFeignClient skuInfoFeignClient;
 
     //    @Override
 //    public SkuDetailTo getSkuDetail(Long skuId) {
@@ -53,24 +52,24 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         SkuDetailTo skuDetailTo = new SkuDetailTo();
         //采用异步编排方式来对查询商品详情进行异步处理
 
-        SkuInfo skuInfo = skuDetailFeignClient.getSkuInfo(skuId).getData();
+        SkuInfo skuInfo = skuInfoFeignClient.getSkuInfo(skuId).getData();
         //1.设置图片列表
-        List<SkuImage> skuImageList = skuDetailFeignClient.getSkuImageList(skuId).getData();
+        List<SkuImage> skuImageList = skuInfoFeignClient.getSkuImageList(skuId).getData();
         skuInfo.setSkuImageList(skuImageList);
         //2.设置基本信息
         skuDetailTo.setSkuInfo(skuInfo);
         //3.设置实时价格
-        BigDecimal price = skuDetailFeignClient.get1010Price(skuId).getData();
+        BigDecimal price = skuInfoFeignClient.get1010Price(skuId).getData();
         skuDetailTo.setPrice(price);
 
         //4.设置分类
-        CategoryViewTo categoryViewTo = skuDetailFeignClient.getCategoryView(skuInfo.getCategory3Id()).getData();
+        CategoryViewTo categoryViewTo = skuInfoFeignClient.getCategoryView(skuInfo.getCategory3Id()).getData();
         skuDetailTo.setCategoryView(categoryViewTo);
         //5.设置sku属性
-        List<SpuSaleAttr> spuSaleAttrList = skuDetailFeignClient.getSpuSaleAttrList(skuInfo.getSpuId(), skuId).getData();
+        List<SpuSaleAttr> spuSaleAttrList = skuInfoFeignClient.getSpuSaleAttrList(skuInfo.getSpuId(), skuId).getData();
         skuDetailTo.setSpuSaleAttrList(spuSaleAttrList);
         //6.设置skuValueJson
-        String str = skuDetailFeignClient.getValueJson(skuInfo.getSpuId()).getData();
+        String str = skuInfoFeignClient.getValueJson(skuInfo.getSpuId()).getData();
         skuDetailTo.setValuesSkuJson(str);
 
         return skuDetailTo;
@@ -83,40 +82,40 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         //采用异步编排方式来对查询商品详情进行异步处理
         //2.设置基本信息
         CompletableFuture<SkuInfo> skuInfoFuture = CompletableFuture.supplyAsync(() -> {
-            SkuInfo skuInfo = skuDetailFeignClient.getSkuInfo(skuId).getData();
+            SkuInfo skuInfo = skuInfoFeignClient.getSkuInfo(skuId).getData();
             skuDetailTo.setSkuInfo(skuInfo);
             return skuInfo;
         }, executor);
 
         //1.设置图片列表
         CompletableFuture<Void> imageFuture = skuInfoFuture.thenAcceptAsync(skuInfo -> {
-            List<SkuImage> skuImageList = skuDetailFeignClient.getSkuImageList(skuId).getData();
+            List<SkuImage> skuImageList = skuInfoFeignClient.getSkuImageList(skuId).getData();
             skuInfo.setSkuImageList(skuImageList);
         }, executor);
 
 
         //3.设置实时价格
         CompletableFuture<Void> priceFuture = CompletableFuture.runAsync(() -> {
-            BigDecimal price = skuDetailFeignClient.get1010Price(skuId).getData();
+            BigDecimal price = skuInfoFeignClient.get1010Price(skuId).getData();
             skuDetailTo.setPrice(price);
         }, executor);
 
 
         //4.设置分类
         CompletableFuture<Void> categoryFuture = skuInfoFuture.thenAcceptAsync(skuInfo -> {
-            CategoryViewTo categoryViewTo = skuDetailFeignClient.getCategoryView(skuInfo.getCategory3Id()).getData();
+            CategoryViewTo categoryViewTo = skuInfoFeignClient.getCategoryView(skuInfo.getCategory3Id()).getData();
             skuDetailTo.setCategoryView(categoryViewTo);
         }, executor);
 
         //5.设置sku属性
         CompletableFuture<Void> skuAttrFuture = skuInfoFuture.thenAcceptAsync(skuInfo -> {
-            List<SpuSaleAttr> spuSaleAttrList = skuDetailFeignClient.getSpuSaleAttrList(skuInfo.getSpuId(), skuId).getData();
+            List<SpuSaleAttr> spuSaleAttrList = skuInfoFeignClient.getSpuSaleAttrList(skuInfo.getSpuId(), skuId).getData();
             skuDetailTo.setSpuSaleAttrList(spuSaleAttrList);
         }, executor);
 
         //6.设置skuValueJson
         CompletableFuture<Void> valueJsonFuture = skuInfoFuture.thenAcceptAsync(skuInfo -> {
-            String str = skuDetailFeignClient.getValueJson(skuInfo.getSpuId()).getData();
+            String str = skuInfoFeignClient.getValueJson(skuInfo.getSpuId()).getData();
             skuDetailTo.setValuesSkuJson(str);
         }, executor);
 

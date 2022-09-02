@@ -21,6 +21,7 @@ public class MallCacheAutoConfiguration {
 
     @Autowired
     private RedisProperties redisProperties;
+
     @Bean
     public CacheService cacheService() {
         CacheServiceImpl cacheService = new CacheServiceImpl();

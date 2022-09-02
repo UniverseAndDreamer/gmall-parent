@@ -9,10 +9,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 
-@Import({ Swagger2Config.class})
+@Import({Swagger2Config.class})
 @EnableAspectJAutoProxy
 @EnableThreadPool
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.atguigu.gmall.feign.product")
 @SpringCloudApplication
 public class ItemMainApplication {
     public static void main(String[] args) {

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
-@Import({Swagger2Config.class, RedissonAutoConfiguration.class})
+@Import({Swagger2Config.class})
 @MapperScan("com.atguigu.gmall.product.mapper")
 @SpringCloudApplication
 public class ProductMainApplication {

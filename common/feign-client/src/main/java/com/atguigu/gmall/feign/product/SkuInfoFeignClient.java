@@ -1,11 +1,10 @@
-package com.atguigu.gmall.item.feign;
+package com.atguigu.gmall.feign.product;
 
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.product.SkuImage;
 import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.atguigu.gmall.model.to.CategoryViewTo;
-import com.atguigu.gmall.model.to.SkuDetailTo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +15,7 @@ import java.util.List;
 
 @FeignClient("service-product")
 @RequestMapping("/api/inner/rpc/product")
-public interface SkuDetailFeignClient {
+public interface SkuInfoFeignClient {
 
 //    @GetMapping("/skuDetail/{skuId}")
 //    Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId);
