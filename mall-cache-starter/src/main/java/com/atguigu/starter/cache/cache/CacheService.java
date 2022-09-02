@@ -20,6 +20,8 @@ public interface CacheService {
 
     void saveCacheData(String s, Object formRPC);
 
+    void saveCacheData(String s, Object formRPC, long ttl);
+
     void addSkuIdForBloom(Long skuId);
 
     boolean tryLock(Long skuId);
@@ -31,4 +33,7 @@ public interface CacheService {
     boolean tryLock(String lockName);
 
     void unlock(String lockName);
+
+    void delay2Delete(String cacheKey);
+
 }

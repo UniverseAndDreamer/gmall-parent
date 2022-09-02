@@ -41,8 +41,7 @@ public class CacheAspect {
      */
     @Around("@annotation(com.atguigu.starter.cache.annotation.GmallCache)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
-        //前置通知：
-        System.out.println("前置通知。。。。");
+
         //  1.获取缓存名
         Object[] args = joinPoint.getArgs();
         Object arg = args[0];
@@ -83,8 +82,10 @@ public class CacheAspect {
                 //5.加锁成功，调用业务方法
                 Object proceed = joinPoint.proceed(args);
                 //返回通知：
-                //6.存入缓存中,
-                cacheService.saveCacheData(cacheKey, proceed);
+                //6.存入缓存中
+                //从注解中解析出过期时间
+                long ttl = determineTtl(joinPoint);
+                cacheService.saveCacheData(cacheKey, proceed,ttl);
                 return proceed;
             }else{
                 //加锁失败，当前线程睡眠1s后直接查询内存
@@ -95,6 +96,13 @@ public class CacheAspect {
             //7.解锁
             cacheService.unlock(lockName);
         }
+    }
+
+    private long determineTtl(ProceedingJoinPoint joinPoint) {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+        long ttl = method.getAnnotation(GmallCache.class).ttl();
+        return ttl;
     }
 
     private String determineLockName(ProceedingJoinPoint joinPoint) {
@@ -142,7 +150,6 @@ public class CacheAspect {
     }
 
     private <T> T evaluateExpression(String expression, ProceedingJoinPoint joinPoint, Class<T> clz) {
-
         Expression parseExpression = parser.parseExpression(expression, parserContext);
         StandardEvaluationContext context = new StandardEvaluationContext();
         Object[] args = joinPoint.getArgs();

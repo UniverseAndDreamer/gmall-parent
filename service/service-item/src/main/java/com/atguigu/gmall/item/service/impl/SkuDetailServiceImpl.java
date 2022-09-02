@@ -46,37 +46,35 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     @Autowired
     private CacheService cacheService;
 
-//    @Override
-//    public SkuDetailTo getSkuDetail(Long skuId) {
-//
-//
-//
-//        SkuDetailTo skuDetailTo = new SkuDetailTo();
-//        //采用异步编排方式来对查询商品详情进行异步处理
-//
-//        SkuInfo skuInfo = skuDetailFeignClient.getSkuInfo(skuId).getData();
-//        //1.设置图片列表
-//        List<SkuImage> skuImageList = skuDetailFeignClient.getSkuImageList(skuId).getData();
-//        skuInfo.setSkuImageList(skuImageList);
-//        //2.设置基本信息
-//        skuDetailTo.setSkuInfo(skuInfo);
-//        //3.设置实时价格
-//        BigDecimal price = skuDetailFeignClient.get1010Price(skuId).getData();
-//        skuDetailTo.setPrice(price);
-//
-//        //4.设置分类
-//        CategoryViewTo categoryViewTo = skuDetailFeignClient.getCategoryView(skuInfo.getCategory3Id()).getData();
-//        skuDetailTo.setCategoryView(categoryViewTo);
-//        //5.设置sku属性
-//        List<SpuSaleAttr> spuSaleAttrList = skuDetailFeignClient.getSpuSaleAttrList(skuInfo.getSpuId(), skuId).getData();
-//        skuDetailTo.setSpuSaleAttrList(spuSaleAttrList);
-//        //6.设置skuValueJson
-//        String str = skuDetailFeignClient.getValueJson(skuInfo.getSpuId()).getData();
-//        skuDetailTo.setValuesSkuJson(str);
-//
-//        return skuDetailTo;
-//    }
+    public SkuDetailTo getSkuDetailV1(Long skuId) {
 
+
+
+        SkuDetailTo skuDetailTo = new SkuDetailTo();
+        //采用异步编排方式来对查询商品详情进行异步处理
+
+        SkuInfo skuInfo = skuDetailFeignClient.getSkuInfo(skuId).getData();
+        //1.设置图片列表
+        List<SkuImage> skuImageList = skuDetailFeignClient.getSkuImageList(skuId).getData();
+        skuInfo.setSkuImageList(skuImageList);
+        //2.设置基本信息
+        skuDetailTo.setSkuInfo(skuInfo);
+        //3.设置实时价格
+        BigDecimal price = skuDetailFeignClient.get1010Price(skuId).getData();
+        skuDetailTo.setPrice(price);
+
+        //4.设置分类
+        CategoryViewTo categoryViewTo = skuDetailFeignClient.getCategoryView(skuInfo.getCategory3Id()).getData();
+        skuDetailTo.setCategoryView(categoryViewTo);
+        //5.设置sku属性
+        List<SpuSaleAttr> spuSaleAttrList = skuDetailFeignClient.getSpuSaleAttrList(skuInfo.getSpuId(), skuId).getData();
+        skuDetailTo.setSpuSaleAttrList(spuSaleAttrList);
+        //6.设置skuValueJson
+        String str = skuDetailFeignClient.getValueJson(skuInfo.getSpuId()).getData();
+        skuDetailTo.setValuesSkuJson(str);
+
+        return skuDetailTo;
+    }
 
     public SkuDetailTo getSkuDetailRPC(Long skuId) throws Exception {
 
@@ -134,7 +132,6 @@ public class SkuDetailServiceImpl implements SkuDetailService {
 
         return skuDetailTo;
     }
-    //TODO 2.使用AOP以及自定义注解，通用的解决从缓存中取数据的问题。实现用注解即可缓存数据
 
     public SkuDetailTo getSkuDetailWithCache(Long skuId) throws Exception {
         String cacheKey = RedisConst.SKUDETAIL_KEY_PREFIX + skuId;
@@ -183,7 +180,8 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     @GmallCache(cacheKey = RedisConst.SKUDETAIL_KEY_PREFIX + "#{#params[0]}",
             bloomName = RedisConst.BLOOM_SKUID,
             bloomValue = "#{#params[0]}",
-            lockName = RedisConst.LOCK_SKU_DETAIL + "#{#params[0]}")
+            lockName = RedisConst.LOCK_SKU_DETAIL + "#{#params[0]}",
+            ttl=60*30L)
     public SkuDetailTo getSkuDetail(Long skuId) throws Exception {
         SkuDetailTo skuDetailRPC = getSkuDetailRPC(skuId);
         return skuDetailRPC;

@@ -46,6 +46,16 @@ public class SkuInfoController {
         return Result.ok();
     }
 
+    /**
+     * 延迟双删
+     * @param skuInfo
+     * @return
+     */
+    public Result update(SkuInfo skuInfo) {
+        skuInfoService.updateByIdAndCache(skuInfo);
+        return Result.ok();
+    }
+
 
 
 }

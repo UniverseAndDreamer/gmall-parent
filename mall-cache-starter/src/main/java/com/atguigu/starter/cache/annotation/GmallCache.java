@@ -15,4 +15,6 @@ public @interface GmallCache {
 
 
     String lockName() default "lock:global";
+
+    long ttl() default 60 * 30l;
 }

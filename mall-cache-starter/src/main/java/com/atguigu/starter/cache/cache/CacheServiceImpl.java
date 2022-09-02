@@ -11,6 +11,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
@@ -21,6 +23,8 @@ public class CacheServiceImpl implements CacheService {
     private StringRedisTemplate redisTemplate;
     @Autowired
     private RedissonClient redissonClient;
+
+    ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(4);
 
 
     @Override
@@ -75,6 +79,22 @@ public class CacheServiceImpl implements CacheService {
             redisTemplate.opsForValue().set(s, jsonValue, RedisConst.VALUE_TTL, TimeUnit.SECONDS);
         }
     }
+    /**
+     * 缓存数据:带过期时间
+     * @param s
+     * @param formRPC
+     * @param ttl
+     */
+    @Override
+    public void saveCacheData(String s, Object formRPC, long ttl) {
+        if (formRPC == null) {
+            //说明要缓存的数据为空
+            redisTemplate.opsForValue().set(s, RedisConst.SKUDETAIL_VALUE_NULL, RedisConst.VALUE_NULL_TTL, TimeUnit.SECONDS);
+        } else {
+            String jsonValue = Jsons.toStr(formRPC);
+            redisTemplate.opsForValue().set(s, jsonValue, ttl, TimeUnit.SECONDS);
+        }
+    }
 
     /**
      * 向Bloom过滤器中添加数据
@@ -121,6 +141,19 @@ public class CacheServiceImpl implements CacheService {
         lock.unlock();
     }
 
-
-
+    /**
+     * 延迟双删：提交一个延时任务，在修改数据库后删除两次缓存中的内容
+     *      存在问题：在删除时如果断电   则会失效
+     *      解决：1.采用分布式池框架，Redisson
+     *           2.将任务缓存至redis中，这样断电之后，redis中的数据可以恢复
+     * @param cacheKey
+     */
+    @Override
+    public void delay2Delete(String cacheKey) {
+        redisTemplate.delete(cacheKey);
+        //开启一个异步的
+        scheduledThreadPool.schedule(() -> {
+            redisTemplate.delete(cacheKey);
+        }, 5, TimeUnit.SECONDS);
+    }
 }

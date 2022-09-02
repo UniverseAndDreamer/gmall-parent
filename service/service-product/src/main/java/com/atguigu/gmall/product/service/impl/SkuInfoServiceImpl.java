@@ -8,6 +8,7 @@ import com.atguigu.gmall.model.to.SkuValueJsonTo;
 import com.atguigu.gmall.product.mapper.BaseCategory2Mapper;
 import com.atguigu.gmall.product.mapper.BaseCategory3Mapper;
 import com.atguigu.gmall.product.service.*;
+import com.atguigu.starter.cache.cache.CacheService;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -41,6 +42,8 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
     private BaseCategory3Mapper baseCategory3Mapper;
     @Autowired
     private SpuSaleAttrService spuSaleAttrService;
+    @Autowired
+    private CacheService cacheService;
     @Override
     public void saveSkuInfo(SkuInfo skuInfo) {
         //1.存储sku基本信息
@@ -121,6 +124,12 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
 
         return skuInfoMapper.getAllSkuIds();
 
+    }
+
+    @Override
+    public void updateByIdAndCache(SkuInfo skuInfo) {
+        this.updateById(skuInfo);
+        cacheService.delay2Delete(skuInfo.getId() + "");
     }
 
 
