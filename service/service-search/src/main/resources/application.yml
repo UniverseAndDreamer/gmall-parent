@@ -1,0 +1,13 @@
+server:
+  port: 7300
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  elasticsearch:
+    rest:
+      uris: http://192.168.6.200:9200
+logging:
+  level:
+    tracer: trace #打开追踪器
+    org.elasticsearch: trace
+

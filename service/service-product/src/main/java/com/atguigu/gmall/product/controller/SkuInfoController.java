@@ -31,15 +31,22 @@ public class SkuInfoController {
         return Result.ok();
     }
 
-    //    /onSale/
-
+    /**
+     * 商品上架：把商品数据存入ES中
+     * @param skuId
+     * @return
+     */
     @GetMapping("/onSale/{skuId}")
     public Result onSale(@PathVariable("skuId") Long skuId) {
         skuInfoService.onSale(skuId);
         return Result.ok();
     }
-//    /cancelSale/{skuId}
 
+    /**
+     * 商品下架：删除ES中指定的商品
+     * @param skuId
+     * @return
+     */
     @GetMapping("/cancelSale/{skuId}")
     public Result cancelSale(@PathVariable("skuId") Long skuId) {
         skuInfoService.cancelSale(skuId);

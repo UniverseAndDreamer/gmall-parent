@@ -1,6 +1,11 @@
 package com.atguigu.gmall.product.service.impl;
+import com.atguigu.gmall.model.list.SearchAttr;
+import com.google.common.collect.Lists;
+import java.util.Date;
 
 import com.atguigu.gmall.common.util.Jsons;
+import com.atguigu.gmall.feign.search.SearchFeignClient;
+import com.atguigu.gmall.model.list.Goods;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
@@ -44,6 +49,11 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
     private SpuSaleAttrService spuSaleAttrService;
     @Autowired
     private CacheService cacheService;
+    @Autowired
+    private BaseTrademarkService baseTrademarkService;
+    @Autowired
+    private SearchFeignClient searchFeignClient;
+
     @Override
     public void saveSkuInfo(SkuInfo skuInfo) {
         //1.存储sku基本信息
@@ -66,15 +76,61 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         skuImageList.forEach(skuImage -> skuImage.setSkuId(id));
         skuImageService.saveBatch(skuImageList);
     }
-
+    /**
+     * 商品上架：把商品数据存入ES中
+     * @param skuId
+     * @return
+     */
     @Override
     public void onSale(Long skuId) {
         skuInfoMapper.updateSaleState(skuId,1);
+        Goods goods = getGoodsBySkuId(skuId);
+        searchFeignClient.save(goods);
+
     }
 
+    private Goods getGoodsBySkuId(Long skuId) {
+        Goods goods = new Goods();
+        SkuInfo skuInfo = getById(skuId);
+        goods.setId(skuId);
+        goods.setDefaultImg(skuInfo.getSkuDefaultImg());
+        goods.setTitle(skuInfo.getSkuName());
+        goods.setPrice(skuInfo.getPrice().doubleValue());
+        goods.setCreateTime(new Date());
+        //获取商品的品牌信息
+        goods.setTmId(skuInfo.getTmId());
+        LambdaQueryWrapper<BaseTrademark> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(BaseTrademark::getId, skuInfo.getTmId());
+        BaseTrademark trademark = baseTrademarkService.getOne(queryWrapper);
+        goods.setTmName(trademark.getTmName());
+        goods.setTmLogoUrl(trademark.getLogoUrl());
+        //获取商品的三级分类信息
+        CategoryViewTo categoryView = baseCategory3Mapper.getCategoryView(skuInfo.getCategory3Id());
+
+        goods.setCategory1Id(categoryView.getCategory1Id());
+        goods.setCategory1Name(categoryView.getCategory1Name());
+        goods.setCategory2Id(categoryView.getCategory2Id());
+        goods.setCategory2Name(categoryView.getCategory2Name());
+        goods.setCategory3Id(categoryView.getCategory3Id());
+        goods.setCategory3Name(categoryView.getCategory3Name());
+
+        goods.setHotScore(0L);
+        List<SearchAttr> searchAttrList = skuAttrValueService.getSearchAttrList(skuId);
+
+        goods.setAttrs(searchAttrList);
+
+        return goods;
+    }
+
+    /**
+     * 商品下架：删除ES中指定的商品
+     * @param skuId
+     * @return
+     */
     @Override
     public void cancelSale(Long skuId) {
         skuInfoMapper.updateSaleState(skuId,0);
+        searchFeignClient.delete(skuId);
     }
 
     @Override
