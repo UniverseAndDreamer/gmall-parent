@@ -29,8 +29,27 @@ public class SearchController {
     public String search(SearchParamVo searchParamVo, Model model, HttpServletRequest request) {
 
 
-//        Result<SearchResponseVo> result = searchFeignClient.search(searchParamVo);
-
+        Result<SearchResponseVo> result = searchFeignClient.search(searchParamVo);
+        SearchResponseVo data = result.getData();
+        //1.以前检索页面点击传来的所有条件，原封不动返回给页面
+        model.addAttribute("searchParam", data.getSearchParamVo());
+        //2.品牌面包屑位置的显示
+        model.addAttribute("trademarkParam",data.getTrademarkParam() );
+        //3.平台属性面包屑
+        model.addAttribute("propsParamList",data.getPropsParamList() );
+        //4.品牌列表的展示
+        model.addAttribute("trademarkList", data.getTrademarkList());
+        //5.列表中所有商品的平台属性集合
+        model.addAttribute("attrsList", data.getAttrsList());
+        //6.拼接的url
+        model.addAttribute("urlParam", data.getUrlParam());
+        //7.排序规则
+        model.addAttribute("orderMap", data.getOrderMap());
+        //8.商品的集合
+        model.addAttribute("goodsList", data.getGoodsList());
+        //9.分页数据
+        model.addAttribute("pageNo", data.getPageNo());
+        model.addAttribute("totalPages", data.getTotalPages());
 
         return "list/index.html";
     }
