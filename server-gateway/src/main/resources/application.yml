@@ -20,10 +20,18 @@ spring:
             allowedHeaders: "*"
             allowCredentials: true
       routes: #配置路由规则
+        # service-product模块路由
         - id: product-route
           uri: lb://service-product
           predicates:
             - Path=/admin/product/**
+        # service-user模块路由
+        - id: user-route
+          uri: lb://service-user
+          predicates:
+            - Path=/api/user/**
+
+        # web-all模块路由
         - id: web-all-route
           uri: lb://web-all
           predicates:

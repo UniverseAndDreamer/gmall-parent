@@ -189,7 +189,13 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         SkuDetailTo skuDetailRPC = getSkuDetailRPC(skuId);
         return skuDetailRPC;
     }
-    //更新热度分的方法
+
+    /**
+     * 更新商品的热度分：
+     *      1.从redis中increment一个变量hotScore
+     *      2.积累到一定量对ES中进行更新
+     * @param skuId
+     */
     @Override
     public void updateHotScore(Long skuId) {
         //从redis中取出热度分
