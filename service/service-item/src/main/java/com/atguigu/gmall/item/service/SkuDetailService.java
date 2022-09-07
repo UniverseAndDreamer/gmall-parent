@@ -6,4 +6,6 @@ import java.util.concurrent.ExecutionException;
 
 public interface SkuDetailService {
     SkuDetailTo getSkuDetail(Long skuId) throws Exception;
+
+    void updateHotScore(Long skuId);
 }

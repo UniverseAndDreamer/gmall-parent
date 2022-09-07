@@ -2,6 +2,7 @@ package com.atguigu.gmall.item.service.impl;
 
 import com.atguigu.gmall.common.constant.RedisConst;
 import com.atguigu.gmall.feign.product.SkuInfoFeignClient;
+import com.atguigu.gmall.feign.search.SearchFeignClient;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
 import com.atguigu.gmall.model.product.SkuInfo;
@@ -41,6 +42,9 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     //    HashMap<Long, SkuDetailTo> map = new HashMap<>();
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private SearchFeignClient searchFeignClient;
 
     @Autowired
     private CacheService cacheService;
@@ -184,6 +188,17 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     public SkuDetailTo getSkuDetail(Long skuId) throws Exception {
         SkuDetailTo skuDetailRPC = getSkuDetailRPC(skuId);
         return skuDetailRPC;
+    }
+    //更新热度分的方法
+    @Override
+    public void updateHotScore(Long skuId) {
+        //从redis中取出热度分
+        Long increment = redisTemplate.opsForValue().increment(RedisConst.SKU_HOTSCORE_PREFIX + skuId);
+        //远程调用接口对ES中的热度分进行更新
+        if (increment % 100 == 0) {
+            //累计到每100分更新一次
+            searchFeignClient.updateHotScore(skuId, increment);
+        }
     }
 
 

@@ -29,11 +29,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.HighlightQuery;
-import org.springframework.data.elasticsearch.core.query.HighlightQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
-import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.elasticsearch.core.query.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -68,6 +66,20 @@ public class GoodsServiceImpl implements GoodsService {
         SearchResponseVo searchResponseVo = buildSearchResponseResult(searchParam, goodsHits);
 
         return searchResponseVo;
+    }
+
+    /**
+     * ES中更新热度分
+     *
+     * @param skuId
+     * @param score
+     */
+    @Override
+    public void updateHotScore(Long skuId, Long score) {
+        Document document = Document.create().append("hotScore", score);
+        UpdateQuery build = UpdateQuery.builder(skuId.toString()).withDocument(document).build();
+        restTemplate.update(build, IndexCoordinates.of("goods"));
+
     }
 
     /**
@@ -178,7 +190,7 @@ public class GoodsServiceImpl implements GoodsService {
 
         return query;
     }
-    //TODO 动态构建响应结果
+    //动态构建响应结果
     private SearchResponseVo buildSearchResponseResult(SearchParamVo searchParam, SearchHits<Goods> goodsHits) {
 
         SearchResponseVo searchResponseVo = new SearchResponseVo();
@@ -241,7 +253,6 @@ public class GoodsServiceImpl implements GoodsService {
         return searchResponseVo;
     }
 
-
     private List<AttrVo> buildAttrList(SearchHits<Goods> goodsHits) {
         ParsedNested attrAgg = goodsHits.getAggregations().get("attrAgg");
         ParsedLongTerms attrIdAgg = attrAgg.getAggregations().get("attrIdAgg");
@@ -264,7 +275,6 @@ public class GoodsServiceImpl implements GoodsService {
         }
         return attrsList;
     }
-
 
     private List<TrademarkVo> buildTrademarkList(SearchHits<Goods> goodsHits) {
         ParsedLongTerms tmIdAgg = goodsHits.getAggregations().get("tmIdAgg");

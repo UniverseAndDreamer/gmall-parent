@@ -14,4 +14,6 @@ public class RedisConst {
     public static final String LOCK_SKU_DETAIL = "lock:sku:detail:";
     public static final int SEARCH_PAGE_SIZE = 10;
 
+    public static final String SKU_HOTSCORE_PREFIX = "sku:hotScore:";
+
 }

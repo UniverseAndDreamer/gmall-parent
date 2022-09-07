@@ -45,4 +45,18 @@ public class ApiSearchController {
         return Result.ok();
     }
 
+    /**
+     * 根据SkuId更新热度分
+     * @param skuId
+     * @param score
+     * @return
+     */
+    @GetMapping("/goods/updateHotScore/{skuId}")
+    public Result updateHotScore(@PathVariable("skuId") Long skuId,
+                                 @RequestParam("score") Long score) {
+        goodsService.updateHotScore(skuId, score);
+        return Result.ok();
+    }
+
+
 }

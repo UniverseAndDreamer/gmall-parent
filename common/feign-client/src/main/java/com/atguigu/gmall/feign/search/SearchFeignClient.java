@@ -20,4 +20,7 @@ public interface SearchFeignClient {
 
     @DeleteMapping("/goods/{skuId}")
     Result delete(@PathVariable("skuId") Long skuId);
+
+    @GetMapping("/goods/updateHotScore/{skuId}")
+    Result updateHotScore(@PathVariable("skuId") Long skuId, @RequestParam("score") Long score);
 }
