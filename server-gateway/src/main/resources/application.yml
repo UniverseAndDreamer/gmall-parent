@@ -38,5 +38,20 @@ spring:
             - Host=**.gmall.com
 
 
+app:
+  auth:
+    no-auth-url: #任意请求都可以访问的资源
+      - /js/**
+      - /img/**
+      - /css/**
+      - /login.html
+    logined-url: #登录后才可以访问的资源
+      - /order/**
+
+    login-page: http://passport.gmall.com/login.html  #登录页面
+
+    deny-url: #禁止访问的资源
+      - /api/inner/**
+
 
 

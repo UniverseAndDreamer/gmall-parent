@@ -17,4 +17,6 @@ public class RedisConst {
     public static final String SKU_HOTSCORE_PREFIX = "sku:hotScore:";//拼接skuId
 
     public static final String LOGIN_USER = "user:login:";//拼接token
+    public static final String USERID_HEADER = "userId";
+
 }
