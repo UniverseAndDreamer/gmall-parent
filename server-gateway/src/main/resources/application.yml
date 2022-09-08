@@ -30,6 +30,12 @@ spring:
           uri: lb://service-user
           predicates:
             - Path=/api/user/**
+        # service-cart模块路由
+        - id: cart-route
+          uri: lb://service-cart
+          predicates:
+            - Path=/api/cart/**
+
 
         # web-all模块路由
         - id: web-all-route
