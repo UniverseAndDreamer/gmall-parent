@@ -29,6 +29,16 @@ public class ApiCartController {
         return Result.ok(skuInfo);
     }
 
+    /**
+     * 删除选中的商品
+     * @return
+     */
+    @GetMapping("/deleteChecked")
+    public Result deleteChecked() {
+        cartService.deleteChecked();
+        return null;
+    }
+
 
 
 

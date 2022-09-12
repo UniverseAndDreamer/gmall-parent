@@ -45,10 +45,23 @@ public class CartController {
         return "cart/addCart";
     }
 
+    /**
+     * 跳转至购物车首页
+     * @return
+     */
     @GetMapping("/cart.html")
     public String cart() {
 
         return "/cart/index";
     }
+
+    //    http://cart.gmall.com/cart.html
+    @GetMapping("/cart/deleteChecked")
+    public String deleteChecked() {
+        cartFeignClient.deleteChecked();
+        return "redirect:http://cart.gmall.com/cart.html";
+    }
+
+
 
 }

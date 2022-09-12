@@ -7,9 +7,10 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "app.threadpool")
 public class ThreadPoolConfigurationProperties {
 
-    private Integer corePoolSize;//: 4
-    private Integer maxPoolSize;//: 8
-    private Long aliveTime;//: 300
-    private Integer blockingQueue;//: 2000
+    private Integer corePoolSize = 2;
+    private Integer maxPoolSize = 4;
+    private Long aliveTime = 300L;
+    private Integer blockingQueue = 200;
+
 
 }
