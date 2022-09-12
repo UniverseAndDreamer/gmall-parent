@@ -19,4 +19,7 @@ public class RedisConst {
     public static final String LOGIN_USER = "user:login:";//拼接token
     public static final String USERID_HEADER = "userId";
 
+    public static final String CART_KEY = "cart:user:";//拼接用户Id或者用户的临时Id
+    public static final String USERTEMPID_HEADER = "usertempid";
+
 }

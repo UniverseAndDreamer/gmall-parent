@@ -102,7 +102,8 @@ public class GlobalAuthFilter implements GlobalFilter {
             }
         }
 
-        //没有携带token进行正常访问
+        //没有携带token进行正常访问,透传用户临时ID
+        exchange = userIdTransport(info, exchange);
         Mono<Void> filter = chain.filter(exchange);
         return filter;
 
@@ -141,15 +142,35 @@ public class GlobalAuthFilter implements GlobalFilter {
      */
     private ServerWebExchange userIdTransport(UserInfo userInfo, ServerWebExchange exchange) {
         //构建新的请求
+        ServerHttpRequest.Builder reqBuilder = exchange.getRequest().mutate();
+
         if (userInfo != null) {
-            ServerHttpRequest newReq = exchange.getRequest()
-                    .mutate().header(RedisConst.USERID_HEADER, userInfo.getId().toString())
-                    .build();
-            //将新请求封装进exchange中
-            exchange = exchange.mutate().request(newReq).response(exchange.getResponse()).build();
-            return exchange;
+            reqBuilder.header(RedisConst.USERID_HEADER, userInfo.getId().toString());
         }
-        return exchange;
+        //用户没登录
+        String userTempId = getUserTempId(exchange);
+        reqBuilder.header(RedisConst.USERTEMPID_HEADER, userTempId);
+
+        ServerWebExchange newExchange = exchange
+                .mutate()
+                .request(reqBuilder.build())
+                .response(exchange.getResponse())
+                .build();
+
+        return newExchange;
+    }
+
+    private String getUserTempId(ServerWebExchange exchange) {
+        ServerHttpRequest request = exchange.getRequest();
+        String userTempId = request.getHeaders().getFirst("userTempId");
+
+        if (StringUtils.isEmpty(userTempId)) {
+            HttpCookie httpCookie = request.getCookies().getFirst("userTempId");
+            if (httpCookie != null) {
+                userTempId = httpCookie.getValue();
+            }
+        }
+        return userTempId;
     }
 
     /**
