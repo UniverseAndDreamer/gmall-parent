@@ -1,15 +1,9 @@
 package com.atguigu.gmall.cart.service.impl;
 
 import java.math.BigDecimal;
-
 import com.atguigu.gmall.common.execption.GmallException;
-import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.result.ResultCodeEnum;
 import com.atguigu.gmall.common.util.Jsons;
-import com.google.common.collect.Lists;
-
-import java.sql.Timestamp;
-
 import com.atguigu.gmall.cart.service.CartService;
 import com.atguigu.gmall.common.auth.AuthUtils;
 import com.atguigu.gmall.common.constant.RedisConst;
@@ -17,9 +11,7 @@ import com.atguigu.gmall.feign.product.SkuInfoFeignClient;
 import com.atguigu.gmall.model.cart.CartInfo;
 import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.user.UserAuthInfo;
-import jodd.time.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -28,7 +20,6 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -62,7 +53,6 @@ public class CartServiceImpl implements CartService {
             String tempCartKey = RedisConst.CART_KEY + currentAuthInfo.getUserTempId();
             redisTemplate.expire(tempCartKey, 90, TimeUnit.DAYS);
         }
-
         return skuInfo;
     }
 
@@ -175,7 +165,6 @@ public class CartServiceImpl implements CartService {
         //
     }
 
-    //TODO 购物车统一异常处理
     /**
      * 更新购物车实时价格
      * @param cartKey
@@ -216,8 +205,7 @@ public class CartServiceImpl implements CartService {
             //说明商品在购物车中不存在,进行商品的新增
             // 新增时应该判断购物车中商品的品类是否超过200
             List<CartInfo> cartInfos = cartList(cartKey);
-
-            if (cartInfos.size() + 1 > 2) {
+            if (cartInfos.size() + 1 > RedisConst.CART_ITEMS_LIMIT) {
                 //说明超过数量限制
                 throw new GmallException(ResultCodeEnum.FAIL);
             }
@@ -226,26 +214,21 @@ public class CartServiceImpl implements CartService {
             //2.3将信息存入购物车
             cartInfo.setCreateTime(new Date());
             cartInfo.setUpdateTime(new Date());
-
             hashOps.put(skuId.toString(), Jsons.toStr(cartInfo));
             data = castToSkuInfo(cartInfo);
-
-
         } else {
             //说明商品在购物车中存在，进行数量的改变
             String skuJson = hashOps.get(skuId.toString());
             CartInfo cartInfo = Jsons.toObj(skuJson, CartInfo.class);
             //如果新增的商品数量超出限制，不予新增
-            if (cartInfo.getSkuNum()+skuNum>200) {
+            if (cartInfo.getSkuNum() + skuNum > RedisConst.CART_SKUNUM_LIMIT) {
                 throw new GmallException(ResultCodeEnum.FAIL);
             }
             cartInfo.setSkuNum(cartInfo.getSkuNum() + skuNum);
             cartInfo.setUpdateTime(new Date());
             hashOps.put(skuId.toString(), Jsons.toStr(cartInfo));
-
             data = castToSkuInfo(cartInfo);
         }
-
         return data;
     }
 

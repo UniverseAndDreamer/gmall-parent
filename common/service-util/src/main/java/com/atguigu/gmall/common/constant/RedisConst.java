@@ -22,4 +22,6 @@ public class RedisConst {
     public static final String CART_KEY = "cart:user:";//拼接用户Id或者用户的临时Id
     public static final String USERTEMPID_HEADER = "usertempid";
 
+    public static final int CART_ITEMS_LIMIT = 200;
+    public static final int CART_SKUNUM_LIMIT = 200;
 }

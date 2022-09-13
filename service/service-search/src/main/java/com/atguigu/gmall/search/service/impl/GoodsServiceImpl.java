@@ -218,11 +218,11 @@ public class GoodsServiceImpl implements GoodsService {
         }
 
 
-        //TODO 4 ES聚合分析商品列表中所有商品的品牌信息
+        // 4 ES聚合分析商品列表中所有商品的品牌信息
         List<TrademarkVo> baseTrademarks = buildTrademarkList(goodsHits);
         searchResponseVo.setTrademarkList(baseTrademarks);
 
-        //TODO 5 ES聚合分析商品泪飙中所有商品的平台属性信息
+        // 5 ES聚合分析商品泪飙中所有商品的平台属性信息
         List<AttrVo> attrsList = buildAttrList(goodsHits);
 
         searchResponseVo.setAttrsList(attrsList);
