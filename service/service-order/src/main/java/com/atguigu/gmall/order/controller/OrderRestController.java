@@ -10,15 +10,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/order/auth")
 public class OrderRestController {
 
-//    api/order/auth/submitOrder?tradeNo=1663083841159_2
 
     @Autowired
     private OrderBizService orderBizService;
 
+    /**
+     * 提交订单信息
+     * @param tradeNo
+     * @param vo
+     * @return
+     */
     @PostMapping("submitOrder")
     public Result submitOrder(@RequestParam("tradeNo") String tradeNo,
                               @RequestBody OrderSubmitVo vo) {
         Long orderId = orderBizService.submitOrder(tradeNo, vo);
-        return Result.ok(orderId);
+        return Result.ok(orderId.toString());
     }
 }
