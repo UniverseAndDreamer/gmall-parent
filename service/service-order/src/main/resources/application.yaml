@@ -1,0 +1,13 @@
+server:
+  port: 7600
+spring:
+  profiles:
+    include: sharding
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.6.200:3306/gmall_order?useSSL=false
+    username: root
+    password: 123456
+  main:
+    allow-bean-definition-overriding: true

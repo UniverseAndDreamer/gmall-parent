@@ -24,4 +24,10 @@ public class RedisConst {
 
     public static final int CART_ITEMS_LIMIT = 200;
     public static final int CART_SKUNUM_LIMIT = 200;
+    public static final String ORDER_TEMP_TOKEN = "order:temptoken:";//order:temptoken:交易号
+
+    public static final long ORDER_EXPIRE_TTL = 45 * 60l;
+
+    public static final long ORDER_REFUND_TTL = 60 * 60 * 24 * 7l;
+
 }

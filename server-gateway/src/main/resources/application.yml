@@ -35,6 +35,12 @@ spring:
           uri: lb://service-cart
           predicates:
             - Path=/api/cart/**
+        # service-order 模块路由
+        - id: order-route
+          uri: lb://service-order
+          predicates:
+            - Path=/api/order/**
+
 
 
         # web-all模块路由
@@ -52,7 +58,8 @@ app:
       - /css/**
       - /login.html
     logined-url: #登录后才可以访问的资源
-      - /order/**
+      - /api/**/auth/**
+      - trade.html
 
     login-page: http://passport.gmall.com/login.html  #登录页面
 

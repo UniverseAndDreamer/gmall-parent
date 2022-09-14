@@ -29,6 +29,10 @@ public class OrderDetail extends BaseEntity {
     @TableField("sku_name")
     private String skuName;
 
+    @ApiModelProperty(value = "用户id")
+    @TableField("user_id")
+    private Long userId;
+
     @ApiModelProperty(value = "图片名称（冗余)")
     @TableField("img_url")
     private String imgUrl;

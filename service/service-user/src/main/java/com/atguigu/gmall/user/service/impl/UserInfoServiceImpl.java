@@ -1,10 +1,14 @@
 package com.atguigu.gmall.user.service.impl;
 
+import com.atguigu.gmall.common.auth.AuthUtils;
 import com.atguigu.gmall.common.constant.RedisConst;
 import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.common.util.MD5;
 import com.atguigu.gmall.model.user.LoginSuccessVo;
+import com.atguigu.gmall.model.user.UserAddress;
+import com.atguigu.gmall.model.user.UserAuthInfo;
 import com.atguigu.gmall.model.user.UserInfo;
+import com.atguigu.gmall.user.service.UserAddressService;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,6 +19,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -28,6 +33,8 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
     implements UserInfoService{
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private UserAddressService userAddressService;
 
     @Override
     public LoginSuccessVo login(UserInfo userInfo) {
@@ -54,6 +61,16 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
     @Override
     public void logout(String token) {
         redisTemplate.delete(RedisConst.LOGIN_USER + token);
+    }
+
+    @Override
+    public List<UserAddress> getUserAddressList() {
+        UserAuthInfo currentAuthInfo = AuthUtils.getCurrentAuthInfo();
+        Long userId = currentAuthInfo.getUserId();
+        LambdaQueryWrapper<UserAddress> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UserAddress::getUserId, userId);
+        List<UserAddress> list = userAddressService.list(queryWrapper);
+        return list;
     }
 }
 

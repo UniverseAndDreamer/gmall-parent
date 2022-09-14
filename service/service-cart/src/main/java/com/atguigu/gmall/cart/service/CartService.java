@@ -21,4 +21,6 @@ public interface CartService {
     void mergeTempAndUserCart();
 
     String determineCartKey();
+
+    List<CartInfo> getCheckedSku();
 }

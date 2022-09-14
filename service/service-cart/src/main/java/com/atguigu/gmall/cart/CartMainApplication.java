@@ -9,7 +9,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringCloudApplication
 @EnableThreadPool
 @EnableAutoExceptionHandler
-@EnableFeignClients(basePackages = {"com.atguigu.gmall.feign.product"})
+@EnableFeignClients(basePackages = {
+        "com.atguigu.gmall.feign.product"
+})
 public class CartMainApplication {
     public static void main(String[] args) {
         SpringApplication.run(CartMainApplication.class, args);

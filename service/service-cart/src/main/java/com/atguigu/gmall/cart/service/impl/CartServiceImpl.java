@@ -299,4 +299,23 @@ public class CartServiceImpl implements CartService {
         return cartKey;
 
     }
+
+    @Override
+    public List<CartInfo> getCheckedSku() {
+        String cartKey = determineCartKey();
+        BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(cartKey);
+        List<CartInfo> collect = hashOps.values().stream()
+                .map(str -> {
+                    CartInfo cartInfo = Jsons.toObj(str, CartInfo.class);
+                    return cartInfo;
+                })
+                .filter(cartInfo -> {
+                    Integer isChecked = cartInfo.getIsChecked();
+                    return isChecked.equals(1);
+                })
+                .collect(Collectors.toList());
+
+
+        return collect;
+    }
 }

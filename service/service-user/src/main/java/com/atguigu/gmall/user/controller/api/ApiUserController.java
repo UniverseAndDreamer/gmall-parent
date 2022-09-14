@@ -4,10 +4,13 @@ package com.atguigu.gmall.user.controller.api;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.result.ResultCodeEnum;
 import com.atguigu.gmall.model.user.LoginSuccessVo;
+import com.atguigu.gmall.model.user.UserAddress;
 import com.atguigu.gmall.model.user.UserInfo;
 import com.atguigu.gmall.user.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -32,9 +35,22 @@ public class ApiUserController {
         return Result.build("", ResultCodeEnum.LOGIN_ERROR);
     }
 
+    /**
+     * 注销功能
+     * @param token
+     * @return
+     */
     @GetMapping("/passport/logout")
     public Result logout(@RequestHeader("token")String token) {
         userInfoService.logout(token);
         return Result.ok();
+    }
+
+
+    @GetMapping("/getUserAddressList")
+    public Result<List<UserAddress>> getUserAddressList() {
+
+        List<UserAddress> userAddresses =  userInfoService.getUserAddressList();
+        return Result.ok(userAddresses);
     }
 }
