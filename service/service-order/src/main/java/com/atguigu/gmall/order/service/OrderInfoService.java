@@ -1,9 +1,12 @@
 package com.atguigu.gmall.order.service;
 
 
+import com.atguigu.gmall.model.enums.ProcessStatus;
 import com.atguigu.gmall.model.order.OrderInfo;
 import com.atguigu.gmall.model.vo.order.OrderSubmitVo;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
 * @author 美貌与智慧并存
@@ -13,4 +16,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface OrderInfoService extends IService<OrderInfo> {
 
     Long saveOrder(OrderSubmitVo vo, String tradeNo);
+
+    void updateOrderStatus(Long orderId, Long userId, ProcessStatus closed, List<ProcessStatus> expected);
 }

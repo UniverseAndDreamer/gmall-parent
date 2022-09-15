@@ -30,4 +30,5 @@ public class RedisConst {
 
     public static final long ORDER_REFUND_TTL = 60 * 60 * 24 * 7l;
 
+    public static final String MQ_RETRY = "mq:message:";
 }

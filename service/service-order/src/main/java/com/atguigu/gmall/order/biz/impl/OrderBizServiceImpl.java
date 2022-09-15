@@ -17,6 +17,7 @@ import com.atguigu.gmall.feign.product.SkuInfoFeignClient;
 import com.atguigu.gmall.feign.user.UserFeignClient;
 import com.atguigu.gmall.feign.ware.WareFeignClient;
 import com.atguigu.gmall.model.cart.CartInfo;
+import com.atguigu.gmall.model.enums.ProcessStatus;
 import com.atguigu.gmall.model.order.OrderInfo;
 import com.atguigu.gmall.model.user.UserAddress;
 import com.atguigu.gmall.model.vo.order.CartInfoVo;
@@ -141,6 +142,22 @@ public class OrderBizServiceImpl implements OrderBizService {
     }
 
     /**
+     * 关闭订单业务
+     * @param orderId
+     * @param userId
+     */
+    @Override
+    public void closeOrder(Long orderId, Long userId) {
+        //更新值
+        ProcessStatus closed = ProcessStatus.CLOSED;
+        //期望原值
+        List<ProcessStatus> expected = Arrays.asList(ProcessStatus.UNPAID, ProcessStatus.FINISHED);
+        //对订单业务进行关闭
+        orderInfoService.updateOrderStatus(orderId, userId, closed, expected);
+
+    }
+
+    /**
      * 生成订单追踪号，在订单提交时进行验证
      * @return
      */
@@ -171,7 +188,7 @@ public class OrderBizServiceImpl implements OrderBizService {
 //        redisTemplate.delete(RedisConst.ORDER_TEMP_TOKEN + tradeNo);
 
         Long execute = redisTemplate.execute(
-                new DefaultRedisScript<Long>(lua, Long.class),
+                new DefaultRedisScript<>(lua, Long.class),
                 Arrays.asList(RedisConst.ORDER_TEMP_TOKEN + tradeNo),
                 new String[]{"1"});
         if (execute > 0) {

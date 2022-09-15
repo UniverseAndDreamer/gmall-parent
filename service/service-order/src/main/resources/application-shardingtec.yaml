@@ -99,6 +99,8 @@ spring:
               column: id
               key-generator-name: xuehua
 
+
+
           order_detail:
             actual-data-nodes: order$->{0..1}ds.order_detail_$->{0..2}
             table-strategy:

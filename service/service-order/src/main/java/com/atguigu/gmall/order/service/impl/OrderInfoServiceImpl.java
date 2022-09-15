@@ -3,10 +3,13 @@ import java.math.BigDecimal;
 
 import com.atguigu.gmall.common.auth.AuthUtils;
 import com.atguigu.gmall.common.constant.RedisConst;
+import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.model.enums.OrderStatus;
 import com.atguigu.gmall.model.enums.ProcessStatus;
 import com.atguigu.gmall.model.order.OrderDetail;
+import com.atguigu.gmall.model.to.to.OrderMsg;
 import com.atguigu.gmall.order.service.OrderDetailService;
+import com.atguigu.gmall.rabbit.constant.MqConst;
 import com.google.common.collect.Lists;
 import java.util.Date;
 import java.util.List;
@@ -20,8 +23,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.atguigu.gmall.order.service.OrderInfoService;
 import com.atguigu.gmall.order.mapper.OrderInfoMapper;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
 * @author 美貌与智慧并存
@@ -33,6 +38,12 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     implements OrderInfoService{
     @Autowired
     private OrderDetailService orderDetailService;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private OrderInfoMapper orderInfoMapper;
+
+    @Transactional
     @Override
     public Long saveOrder(OrderSubmitVo vo, String tradeNo) {
         //1.保存订单信息
@@ -44,9 +55,27 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         orderDetailService.saveBatch(orderDetails);
         //3.向rabbitmq中发送消息，45min后检查订单状态，
         //  若是FINISHED或者UNPAID,则对订单进行关闭处理
-
+        OrderMsg orderMsg = new OrderMsg(AuthUtils.getCurrentAuthInfo().getUserId(), orderInfo.getId());
+        //向消息队列中发送订单创建成功的消息
+        rabbitTemplate.convertAndSend(
+                MqConst.ORDER_EVENT_EXCHANGE,
+                MqConst.ORDER_CREATED_RK,
+                Jsons.toStr(orderMsg));
         return orderInfo.getId();
     }
+
+    @Override
+    public void updateOrderStatus(Long orderId, Long userId, ProcessStatus closed, List<ProcessStatus> expected) {
+        //更新值
+        String orderStatus = closed.getOrderStatus().name();
+        String processStatus = closed.name();
+        //期望原值
+        List<String> statusList = expected.stream().map(status -> status.name()).collect(Collectors.toList());
+
+
+        orderInfoMapper.updateOrderStatus(orderId, userId, orderStatus, processStatus,statusList);
+    }
+
     //准备OrderDetails
     private List<OrderDetail> prepareOrderDetailList(OrderSubmitVo vo, OrderInfo orderInfo) {
 
