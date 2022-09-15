@@ -180,7 +180,9 @@ public class CartServiceImpl implements CartService {
                     cartInfo.setSkuPrice(price);
                     cartInfo.setUpdateTime(new Date());
                     //保存进购物车
-                    hashOps.put(cartInfo.getSkuId().toString(), Jsons.toStr(cartInfo));
+                    if (hashOps.hasKey(cartInfo.getSkuId().toString())) {
+                        hashOps.put(cartInfo.getSkuId().toString(), Jsons.toStr(cartInfo));
+                    }
                 });
         System.out.println(Thread.currentThread().getName() + "进程更新实时价格结束");
     }
