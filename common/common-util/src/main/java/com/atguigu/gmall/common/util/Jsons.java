@@ -10,7 +10,6 @@ public class Jsons {
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     public static String toStr(Object obj) {
-
         try {
             String s = objectMapper.writeValueAsString(obj);
             return s;

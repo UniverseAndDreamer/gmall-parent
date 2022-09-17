@@ -40,7 +40,11 @@ spring:
           uri: lb://service-order
           predicates:
             - Path=/api/order/**
-
+        # service-payment 模块路由
+        - id: payment-route
+          uri: lb://service-payment
+          predicates:
+            - Path=/api/payment/**
 
 
         # web-all模块路由

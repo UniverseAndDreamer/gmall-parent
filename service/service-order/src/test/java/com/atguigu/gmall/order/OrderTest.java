@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @SpringBootTest
@@ -68,6 +70,9 @@ public class OrderTest {
         info2.setUserId(2L);
         orderInfoMapper.insert(info2);
         System.out.println("2号用户订单插入完成....去 0库2表找");
+
+
+
 
         //
 

@@ -21,7 +21,6 @@ public class MQListener {
     public void getMessage(Message message, Channel channel) throws IOException {
 
         String s = new String(message.getBody());
-//        OrderMsg orderMsg = Jsons.toObj(message, OrderMsg.class);
         System.out.println("监听到消息，开始打印消息：s = " + s);
 
         Long increment = redisTemplate.opsForValue().increment(s);

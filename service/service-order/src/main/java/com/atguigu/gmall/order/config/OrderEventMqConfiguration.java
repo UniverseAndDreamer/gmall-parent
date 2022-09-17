@@ -1,10 +1,8 @@
 package com.atguigu.gmall.order.config;
 
 
-import com.alibaba.cloud.nacos.utils.NacosConfigUtils;
 import com.atguigu.gmall.common.constant.RedisConst;
 import com.atguigu.gmall.rabbit.constant.MqConst;
-import org.omg.CORBA.PUBLIC_MEMBER;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
@@ -38,7 +36,7 @@ public class OrderEventMqConfiguration {
     public Queue orderDelayQueue() {
         HashMap<String, Object> arguments = new HashMap<>();
 //        arguments.put("x-message-ttl", RedisConst.ORDER_EXPIRE_TTL * 1000);
-        arguments.put("x-message-ttl", 10 * 1000);
+        arguments.put("x-message-ttl", RedisConst.ORDER_EXPIRE_TTL * 1000);
         arguments.put("x-dead-letter-exchange", MqConst.ORDER_EVENT_EXCHANGE);
         arguments.put("x-dead-letter-routing-key", MqConst.ORDER_DEAD_RK);
         return new Queue(
@@ -94,6 +92,20 @@ public class OrderEventMqConfiguration {
                 null
         );
     }
+
+    /**
+     * springBoot 整合rabbitmq
+     *  1.导入相关jar包
+     *  2.在application.yaml文件中对rabbitmq进行配置
+     *  3.配置自己的rabbitTemplate
+     *      2.1创建一个配置类
+     *      2.2在配置类中配置交换机，队列，绑定机制
+     *  4.发送端消息端发送消息
+     *  5.消费端创建监听器，监听消息队列
+     *      4.1创建一个监听器的配置类
+     *      4.2创建一个@RabbitListener注解的监听器
+     *      4.3在监听器中配置监听消息的方式，以及确认消息等
+     */
 
 
 }
