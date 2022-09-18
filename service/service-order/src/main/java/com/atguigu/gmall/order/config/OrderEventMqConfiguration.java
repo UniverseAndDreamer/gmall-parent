@@ -94,6 +94,35 @@ public class OrderEventMqConfiguration {
     }
 
     /**
+     * 支付成功单队列
+     * @return
+     */
+    @Bean
+    public Queue orderPaidQueue() {
+        return new Queue(
+                MqConst.ORDER_PAID_QUEUE,
+                true,
+                false,
+                false,
+                null);
+    }
+
+    /**
+     * 支付成功队列与交换机进行绑定
+     * @return
+     */
+    @Bean
+    public Binding paidQueueBinding() {
+        return new Binding(
+                MqConst.ORDER_PAID_QUEUE,
+                Binding.DestinationType.QUEUE,
+                MqConst.ORDER_EVENT_EXCHANGE,
+                MqConst.ORDER_PAID_RK,
+                null);
+    }
+
+
+    /**
      * springBoot 整合rabbitmq
      *  1.导入相关jar包
      *  2.在application.yaml文件中对rabbitmq进行配置

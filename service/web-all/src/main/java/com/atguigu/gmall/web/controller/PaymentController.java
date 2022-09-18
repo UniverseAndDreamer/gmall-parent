@@ -22,4 +22,9 @@ public class PaymentController {
         return "/payment/pay";
     }
 
+    @GetMapping("/success")
+    public String toPaySuccessPage() {
+
+        return "/payment/success";
+    }
 }

@@ -9,5 +9,19 @@ public class MqConst {
     public static final String ORDER_CREATED_RK = "order.created";
     //订单死信队列
     public static final String ORDER_DEAD_QUEUE = "order-dead-queue";
+    //死信路由key
     public static final String ORDER_DEAD_RK = "order.dead";
+    //支付成功单队列
+    public static final String ORDER_PAID_QUEUE = "order-paid-queue";
+    public static final String ORDER_PAID_RK = "order.paid";
+
+    public static final String WARE_STOCK_EXCHANGE = "exchange.direct.ware.stock";
+
+    public static final String WARE_STOCK_RK = "ware.stock";
+    //库存扣减结果队列
+    public static final String WARE_ORDER_QUEUE = "queue.ware.order";
+    //库存扣减交换机
+    public static final String WARE_ORDER_EXCHANGE = "exchange.direct.ware.order";
+    //库存扣减路由键
+    public static final String WARE_ORDER_RK = "ware.order";
 }

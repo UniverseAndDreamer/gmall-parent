@@ -10,9 +10,12 @@ import com.atguigu.gmall.model.order.OrderDetail;
 import com.atguigu.gmall.model.to.to.OrderMsg;
 import com.atguigu.gmall.order.service.OrderDetailService;
 import com.atguigu.gmall.rabbit.constant.MqConst;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.collect.Lists;
 import java.util.Date;
 import java.util.List;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 import com.atguigu.gmall.model.activity.CouponInfo;
@@ -74,6 +77,16 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
 
         orderInfoMapper.updateOrderStatus(orderId, userId, orderStatus, processStatus,statusList);
+    }
+
+    @Override
+    public OrderInfo getByIdAndUserId(Long orderId, Long userId) {
+
+        LambdaQueryWrapper<OrderInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderInfo::getUserId, userId)
+                .eq(OrderInfo::getId, orderId);
+        OrderInfo one = this.getOne(queryWrapper);
+        return one;
     }
 
     //准备OrderDetails

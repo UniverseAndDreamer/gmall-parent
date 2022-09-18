@@ -18,4 +18,6 @@ public interface OrderInfoService extends IService<OrderInfo> {
     Long saveOrder(OrderSubmitVo vo, String tradeNo);
 
     void updateOrderStatus(Long orderId, Long userId, ProcessStatus closed, List<ProcessStatus> expected);
+
+    OrderInfo getByIdAndUserId(Long orderId, Long userId);
 }
