@@ -20,4 +20,6 @@ public interface OrderInfoService extends IService<OrderInfo> {
     void updateOrderStatus(Long orderId, Long userId, ProcessStatus closed, List<ProcessStatus> expected);
 
     OrderInfo getByIdAndUserId(Long orderId, Long userId);
+
+    Long submitSeckillOrder(OrderInfo orderInfo);
 }

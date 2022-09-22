@@ -24,4 +24,11 @@ public class MqConst {
     public static final String WARE_ORDER_EXCHANGE = "exchange.direct.ware.order";
     //库存扣减路由键
     public static final String WARE_ORDER_RK = "ware.order";
+    public static final String SECKILL_EVENT_EXCHANGE = "seckill-event-exchange";
+    public static final String SECKILL_ORDERWAIT_RK = "seckill.order.wait";
+    public static final String SECKILL_ORDERWAIT_QUEUE = "seckill-orderwait-queue";
+
+
+    public static final String ORDER_SECKILLOK_RK = "order.seckill.created";
+    public static final String ORDER_SECKILLOK_QUEUE = "order-seckill-create-queue";
 }

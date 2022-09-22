@@ -7,10 +7,7 @@ import com.atguigu.gmall.model.vo.order.OrderConfirmDataVo;
 import com.atguigu.gmall.order.biz.OrderBizService;
 import com.atguigu.gmall.order.service.OrderInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/inner/rpc/order")
@@ -32,4 +29,11 @@ public class ApiOrderController {
         OrderInfo orderInfo = orderInfoService.getById(orderId);
         return Result.ok(orderInfo);
     }
+
+    @PostMapping("/seckillOrder/submit")
+    public Result<Long> submitSeckillOrder(@RequestBody OrderInfo orderInfo) {
+        Long orderId = orderInfoService.submitSeckillOrder(orderInfo);
+        return Result.ok(orderId);
+    }
+
 }

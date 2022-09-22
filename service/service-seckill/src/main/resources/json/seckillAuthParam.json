@@ -1,0 +1,24 @@
+{
+  "consignee": "admin",
+  "consigneeTel": "123456789",
+  "deliveryAddress": "北京市昌平区北七家",
+  "paymentWay": "ONLINE",
+  "orderComment": "",
+  "orderDetailList": [
+    {
+      "id": null,
+      "orderId": null,
+      "skuId": 49,
+      "skuName": "MIX FOLD小米折叠屏手机 2K+折叠屏 骁龙888 一亿像素 哈曼卡顿立体声四扬声器 16GB+512GB 特别版游戏手机",
+      "userId": 2,
+      "imgUrl": "http://192.168.6.200:9000/admin/2022-08-25/5b7a390ff8644e54b6ddd2ca4e70bdff_1.png",
+      "orderPrice": 12999,
+      "skuNum": 1,
+      "hasStock": "1",
+      "createTime": null,
+      "splitTotalAmount": 100,
+      "splitActivityAmount": null,
+      "splitCouponAmount": 12899
+    }
+  ]
+}

@@ -45,6 +45,11 @@ spring:
           uri: lb://service-payment
           predicates:
             - Path=/api/payment/**
+        # service-seckill 模块路由
+        - id: seckill-route
+          uri: lb://service-seckill
+          predicates:
+            - Path=/api/activity/**
 
 
         # web-all模块路由
@@ -61,6 +66,7 @@ app:
       - /img/**
       - /css/**
       - /login.html
+      - /api/user/passport/login
     logined-url: #登录后才可以访问的资源
       - /api/**/auth/**
       - trade.html

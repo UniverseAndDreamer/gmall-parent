@@ -39,7 +39,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
     @Override
     public LoginSuccessVo login(UserInfo userInfo) {
         LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(UserInfo::getName, userInfo.getLoginName());
+        queryWrapper.eq(UserInfo::getLoginName, userInfo.getLoginName());
         queryWrapper.eq(UserInfo::getPasswd, MD5.encrypt(userInfo.getPasswd()));
 
         UserInfo info = this.getOne(queryWrapper);

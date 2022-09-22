@@ -89,6 +89,18 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         return one;
     }
 
+    @Override
+    public Long submitSeckillOrder(OrderInfo orderInfo) {
+        orderInfoMapper.insert(orderInfo);
+        Long orderInfoId = orderInfo.getId();
+        List<OrderDetail> list = orderInfo.getOrderDetailList();
+        list.forEach(orderDetail -> {
+            orderDetail.setOrderId(orderInfoId);
+        });
+        orderDetailService.saveBatch(list);
+        return orderInfoId;
+    }
+
     //准备OrderDetails
     private List<OrderDetail> prepareOrderDetailList(OrderSubmitVo vo, OrderInfo orderInfo) {
 
